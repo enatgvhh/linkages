@@ -16,8 +16,8 @@ class MdDataset(object):
         self.__csw = None
         self.__mdUid = None
         self.__mdName = None
-        self.__capWms = None
-        self.__capWfs = None
+        self.__capWms = []
+        self.__capWfs = []
         
         self.__setCsw()
         self.__setMdUid()
@@ -46,9 +46,9 @@ class MdDataset(object):
         for capUrl in listCapUrl:
             if re.search("REQUEST=GetCapabilities", capUrl.text) != None:
                 if re.search("SERVICE=WFS", capUrl.text) != None:
-                    self.__capWfs = capUrl.text
+                    self.__capWfs.append(capUrl.text)
                 elif re.search("SERVICE=WMS", capUrl.text) != None:
-                    self.__capWms = capUrl.text
+                    self.__capWms.append(capUrl.text)
     
     def getCsw(self):
         """Methode getCsw gibt die URL mit dem eigen CSW-Aufruf des Metadaten-Datasets zurueck
@@ -75,18 +75,18 @@ class MdDataset(object):
         return self.__mdName
     
     def getCapWms(self):
-        """Methode getCapWms gibt die WMS GetCapbilities-URL zurueck
+        """Methode getCapWms gibt eine Liste mit WMS GetCapbilities-URLs zurueck
         
         Returns:
-            String: WMS GetCapbilities-URL
+            List: WMS GetCapbilities-URLs
         """
         return self.__capWms
     
     def getCapWfs(self):
-        """Methode getCapWfs gibt die WFS GetCapbilities-URL zurueck
+        """Methode getCapWfs gibt eine Liste mit WFS GetCapbilities-URLs zurueck
         
         Returns:
-            String: WFS GetCapbilities-URL
+            List: WFS GetCapbilities-URLs
         """
         return self.__capWfs
     

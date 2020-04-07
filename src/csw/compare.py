@@ -32,11 +32,13 @@ class Compare(object):
         """Methode runTest fuehrt alle Test aus.
         
         Returns:
-            List: List mit Test-Results
+            pandas.DataFrame: DataFrame mit Test-Results
         """
         self.__testResults.append(self.md_dataset.getMdName())
         self.__testResults.append(self.md_dataset.getMdUid())
         self.__testResults.append(self.md_dataset.getCsw())
+        self.__testResults.append(str(len(self.md_dataset.getCapWfs())))
+        self.__testResults.append(str(len(self.md_dataset.getCapWms())))
         self.__test1()
         self.__test2()
         self.__test3()
@@ -45,17 +47,17 @@ class Compare(object):
         self.__test6()
         self.__test7()
         
-        df = pd.DataFrame(np.array([self.__testResults]),columns=['md_name', 'md_uri', 'md_wcs', 'md_uri@wfs', 'md_uri@wfs_count', 'md_cap@wfs','md_uri@wms', 'md_uri@wms_count', 'md_cap@wms', 'wfs_uri@md', 'wfs_uri@md_count', 'wms_uri@md', 'wms_uri@md_count', 'wms_csw@md', 'wms_csw@md_count'])           
+        df = pd.DataFrame(np.array([self.__testResults]),columns=['md_ds_name', 'md_ds_uri', 'md_ds_wcs', 'md_ds_count_wfs', 'md_ds_count_wms', 'test1_md_ds_uri2md_wfs_uri', 'test1_count', 'test2_wfs_capabilities','test3_md_ds_uri2md_wms_uri', 'test3_count', 'test4_wms_capabilities', 'test5_md_ds_uri2cap_wfs_uri', 'test5_count', 'test6_md_ds_uri2cap_wms_uri', 'test6_count', 'test7_md_csw2cap_wms_csw', 'test7_count'])           
         return df
     
     def __test1(self):
-        """private Methode __test1 prueft Uebereinstimmung des Metadaten-Dataset
+        """private Methode __test1 prueft Uebereinstimmung des Daten-Metadatensatz
         Ressourcenidentifikators (URI) mit der URI-Referenz im WFS-Metadatensatz.
         Bei Gleichheit: PASSED else FAILED (1/1)
                
-        Referenziert der WFS-Metadatensatz n Metadaten-Datasets: Es wird nur der Start
-        Metadaten-Dataset geprueft, alle weiteren werden ignoriert (Pruefung erfolgt ueber
-        eigenen Metadaten-Dataset).
+        Referenziert der WFS-Metadatensatz n Daten-Metadatensaetze: Es wird nur der Start
+        Daten-Metadatensatz geprueft, alle weiteren werden ignoriert (Pruefung erfolgt ueber
+        eigenen Daten-Metadatensatz).
         Bei Gleichheit Start Metadaten-Dataset: PASSED_MANUAL else FAILED (1/n)
         """
         result = 'FAILED'
@@ -77,25 +79,25 @@ class Compare(object):
     
     def __test2(self):
         """private Methode __test2 prueft Uebereinstimmung des WFS-GetCapabilities-Aufrufs
-        im Metadaten-Dataset zum WFS-Metadatensatz.
+        im Daten-Metadatensatz zum WFS-Metadatensatz.
         Bei Gleichheit: PASSED else FAILED
         """
         result = 'FAILED'
         
-        if self.md_dataset.getCapWfs().casefold() == self.md_wfs.getCap().casefold():
+        if self.md_dataset.getCapWfs()[0].casefold() == self.md_wfs.getCap().casefold():
             result = 'PASSED'
          
         self.__testResults.append(result)
                    
     def __test3(self):
-        """private Methode __test3 prueft Uebereinstimmung des Metadaten-Dataset
+        """private Methode __test3 prueft Uebereinstimmung des Daten-Metadatensatz
         Ressourcenidentifikators (URI) mit der URI-Referenz im WMS-Metadatensatz.
         Bei Gleichheit: PASSED else FAILED (1/1)
                
-        Referenziert der WMS-Metadatensatz n Metadaten-Datasets: Es wird nur der Start
-        Metadaten-Dataset geprueft, alle weiteren werden ignoriert (Pruefung erfolgt ueber
-        eigenen Metadaten-Dataset).
-        Bei Gleichheit Start Metadaten-Dataset: PASSED_MANUAL else FAILED (1/n)
+        Referenziert der WMS-Metadatensatz n Daten-Metadatensaetze: Es wird nur der Start
+        Daten-Metadatensatz geprueft, alle weiteren werden ignoriert (Pruefung erfolgt ueber
+        eigenen Daten-Metadatensatz).
+        Bei Gleichheit Start Daten-Metadatensatz: PASSED_MANUAL else FAILED (1/n)
         """
         result = False
         countTrue = 0
@@ -116,25 +118,25 @@ class Compare(object):
         
     def __test4(self):
         """private Methode __test4 prueft Uebereinstimmung des WMS-GetCapabilities-Aufrufs
-        im Metadaten-Dataset zum WMS-Metadatensatz.
+        im Daten-Metadatensatz zum WMS-Metadatensatz.
         Bei Gleichheit: PASSED else FAILED
         """
         result = 'FAILED'
         
-        if self.md_dataset.getCapWms().casefold() == self.md_wms.getCap().casefold():
+        if self.md_dataset.getCapWms()[0].casefold() == self.md_wms.getCap().casefold():
             result = 'PASSED'
          
         self.__testResults.append(result)
         
     def __test5(self):
-        """private Methode __test5 prueft Uebereinstimmung des Metadaten-Dataset
-        Ressourcenidentifikators (URI) mit den URI-Referenzen im WFS-GetCapabilities-Aufruf.
+        """private Methode __test5 prueft Uebereinstimmung des Daten-Metadatensatz
+        Ressourcenidentifikators (URI) mit den URI-Referenzen im WFS-GetCapabilities-Dokument.
         Bei Gleichheit: PASSED else FAILED (n/n)
                
-        Referenziert der WFS-Metadatensatz n Metadaten-Datasets: Es wird nur der Start
-        Metadaten-Dataset geprueft, alle weiteren werden ignoriert (Pruefung erfolgt ueber
-        eigenen Metadaten-Dataset).
-        Bei Gleichheit Start Metadaten-Dataset: PASSED_MANUAL else FAILED (n/n)
+        Referenziert der WFS-Metadatensatz n Daten-Metadatensaetze: Es wird nur der Start
+        Daten-Metadatensatz geprueft, alle weiteren werden ignoriert (Pruefung erfolgt ueber
+        eigenen Daten-Metadatensatz).
+        Bei Gleichheit Start Daten-Metadatensatz: PASSED_MANUAL else FAILED (n/n)
         """
         result = 'FAILED'
         tmpList = list(dict.fromkeys(self.cap_wfs.getListMdUid()))
@@ -150,19 +152,19 @@ class Compare(object):
                     
                 countTrue += 1
         
-        countStr = str(countTrue) + " from " + str(len(self.cap_wfs.getListMdUid())) + " layer in " + str(countDs) + " ds"   
+        countStr = str(countTrue) + " from " + str(len(self.cap_wfs.getListLayerName())) + " layer in " + str(countDs) + " ds"   
         self.__testResults.append(result)
         self.__testResults.append(countStr)
     
     def __test6(self):
-        """private Methode __test6 prueft Uebereinstimmung des Metadaten-Dataset
-        Ressourcenidentifikators (URI) mit den URI-Referenzen im WMS-GetCapabilities-Aufruf.
+        """private Methode __test6 prueft Uebereinstimmung des Daten-Metadatensatz
+        Ressourcenidentifikators (URI) mit den URI-Referenzen im WMS-GetCapabilities-Dokument.
         Bei Gleichheit: PASSED else FAILED (n/n)
                
-        Referenziert der WMS-Metadatensatz n Metadaten-Datasets: Es wird nur der Start
-        Metadaten-Dataset geprueft, alle weiteren werden ignoriert (Pruefung erfolgt ueber
-        eigenen Metadaten-Dataset).
-        Bei Gleichheit Start Metadaten-Dataset: PASSED_MANUAL else FAILED (n/n)
+        Referenziert der WMS-Metadatensatz n Daten-Metadatensaetze: Es wird nur der Start
+        Daten-Metadatensatz geprueft, alle weiteren werden ignoriert (Pruefung erfolgt ueber
+        eigenen Daten-Metadatensatz).
+        Bei Gleichheit Start Daten-Metadatensatz: PASSED_MANUAL else FAILED (n/n)
         """
         result = 'FAILED'
         tmpList = list(dict.fromkeys(self.cap_wms.getListMdUid()))
@@ -178,19 +180,19 @@ class Compare(object):
                     
                 countTrue += 1
         
-        countStr = str(countTrue) + " from " + str(len(self.cap_wms.getListMdUid())) + " layer in " + str(countDs) + " ds" 
+        countStr = str(countTrue) + " from " + str(len(self.cap_wms.getListLayerName())) + " layer in " + str(countDs) + " ds" 
         self.__testResults.append(result)
         self.__testResults.append(countStr)
     
     def __test7(self):
-        """private Methode __test7 prueft Uebereinstimmung des Metadaten-Dataset
-        CSW-Aufrufs mit den CSW-Aufrufen im WMS-GetCapabilities.
+        """private Methode __test7 prueft Uebereinstimmung des Daten-Metadatensatz
+        CSW-Aufufs mit den CSW-Aufrufen je Layer im WMS-GetCapabilities.
         Bei Gleichheit: PASSED else FAILED (n/n)
                
-        Referenziert der WMS-Metadatensatz n Metadaten-Datasets: Es wird nur der Start
-        Metadaten-Dataset geprueft, alle weiteren werden ignoriert (Pruefung erfolgt ueber
-        eigenen Metadaten-Dataset).
-        Bei Gleichheit Start Metadaten-Dataset: PASSED_MANUAL else FAILED (n/n)
+        Referenziert der WMS-Metadatensatz n Daten-Metadatensaetze: Es wird nur der Start
+        Daten-Metadatensatz geprueft, alle weiteren werden ignoriert (Pruefung erfolgt ueber
+        eigenen Daten-Metadatensatz).
+        Bei Gleichheit Start Daten-Metadatensatz: PASSED_MANUAL else FAILED (n/n)
         """
         result = 'FAILED'
         tmpList = list(dict.fromkeys(self.cap_wms.getListCswLayerUrl()))
@@ -206,7 +208,7 @@ class Compare(object):
                     
                 countTrue += 1
         
-        countStr = str(countTrue) + " from " + str(len(self.cap_wms.getListCswLayerUrl())) + " layer in " + str(countDs) + " ds" 
+        countStr = str(countTrue) + " from " + str(len(self.cap_wms.getListLayerName())) + " layer in " + str(countDs) + " ds" 
         self.__testResults.append(result)
         self.__testResults.append(countStr)
     

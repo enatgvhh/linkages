@@ -4,6 +4,7 @@ import sys
 import requests
 import logging
 import pandas as pd
+import numpy as np
 from lxml import etree
 from csw import mdDataset
 from csw import mdService
@@ -13,7 +14,7 @@ from csw import compare
 
 class Checker(object):
     """Klasse Checker fuehrt alle verketteten Requests (CSW und GetCapabilities) aus und
-    ueberprueft die Linkages.
+    initialisiert die Ueberpruefung der Linkages.
     """
 
     def __init__(self, proxies, logfile, writerfile):
@@ -67,13 +68,33 @@ class Checker(object):
                 self.__clearSearchResult()
                 try:
                     self.md_dataset = mdDataset.MdDataset(etree.tostring(item, encoding='unicode'))
-                    self.__setGetCapabilitiesWfsRequest()
-                    self.__setMdWfsRequest()
-                    self.__setGetCapabilitiesWmsRequest()
-                    self.__setMdWmsRequest()
                     
-                    comp = compare.Compare(self.md_dataset, self.md_wfs, self.md_wms, self.cap_wfs, self.cap_wms)
-                    self.df = self.df.append(comp.runTests())
+                    if len(self.md_dataset.getCapWfs()) == 1 and len(self.md_dataset.getCapWms()) == 1:
+                        self.__setGetCapabilitiesWfsRequest()
+                        self.__setMdWfsRequest()
+                        self.__setGetCapabilitiesWmsRequest()
+                        self.__setMdWmsRequest()
+
+                        comp = compare.Compare(self.md_dataset, self.md_wfs, self.md_wms, self.cap_wfs, self.cap_wms)
+                        self.df = self.df.append(comp.runTests())
+                    else:
+                        countList = []
+                        countList.append(self.md_dataset.getMdName())
+                        countList.append(self.md_dataset.getMdUid())
+                        countList.append(self.md_dataset.getCsw())
+
+                        if len(self.md_dataset.getCapWfs()) == 0:
+                            countList.append(str(0))
+                        else:
+                            countList.append(str(len(self.md_dataset.getCapWfs())))
+
+                        if len(self.md_dataset.getCapWms()) == 0:
+                            countList.append(str(0))
+                        else:
+                            countList.append(str(len(self.md_dataset.getCapWms())))
+
+                        dfTemp = pd.DataFrame(np.array([countList]),columns=['md_ds_name', 'md_ds_uri', 'md_ds_wcs', 'md_ds_count_wfs', 'md_ds_count_wms'])           
+                        self.df = self.df.append(dfTemp)
                 except:
                     message = "error: " + str(sys.exc_info()[0]) + "; " + str(sys.exc_info()[1])
                     self.__logger.error(message)
@@ -81,13 +102,13 @@ class Checker(object):
                     
         self.df = self.df.reset_index()
         self.df = self.df.drop(columns='index')
-        self.df.to_csv(self.__filePath, sep=';', na_rep='NaN', index=True)
+        self.df.to_csv(self.__filePath, sep=';', na_rep='', index=True)
         
     def __setGetCapabilitiesWfsRequest(self):
         """private Methode __setGetCapabilitiesWfsRequest fuehrt WFS GetCapabilities-Request aus"""
         #https://geodienste.hamburg.de ohne proxie
-        #r = requests.get(self.md_dataset.getCapWfs(), proxies=self.__proxies)
-        r = requests.get(self.md_dataset.getCapWfs())
+        #r = requests.get(self.md_dataset.getCapWfs()[0], proxies=self.__proxies)
+        r = requests.get(self.md_dataset.getCapWfs()[0])
         et = etree.fromstring(r.content)
         self.cap_wfs = capWfs.CapWfs(et)
 
@@ -100,8 +121,8 @@ class Checker(object):
     def __setGetCapabilitiesWmsRequest(self):
         """private Methode __setGetCapabilitiesWmsRequest fuehrt WMS GetCapabilities-Request aus"""
         #https://geodienste.hamburg.de ohne proxie
-        #r = requests.get(self.md_dataset.getCapWfs(), proxies=self.__proxies)
-        r = requests.get(self.md_dataset.getCapWms())
+        #r = requests.get(self.md_dataset.getCapWfs()[0], proxies=self.__proxies)
+        r = requests.get(self.md_dataset.getCapWms()[0])
         et = etree.fromstring(r.content)
         self.cap_wms = capWms.CapWms(et)
 

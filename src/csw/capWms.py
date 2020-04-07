@@ -14,10 +14,12 @@ class CapWms(object):
         self.__cswUrl = None
         self.__listMdUid = []
         self.__listCswUrl = []
+        self.__listLayerName = []
         
         self.__setCswUrl()
         self.__setLayerUid()
         self.__setCswLayerUrl()
+        self.__setLayerName()
         
     def __setCswUrl(self):
         """private Methode __setCswUrl extrahiert den CSW-Aufruf auf den Metadatensatz des WMS"""
@@ -38,7 +40,14 @@ class CapWms(object):
             for dictKey, dictValue in cswLayerUrl.items():
                 if dictKey == '{http://www.w3.org/1999/xlink}href':
                     self.__listCswUrl.append(dictValue)
-            
+
+    def __setLayerName(self):
+        """private Methode __setLayerName extrahiert den Namen fuer alle Layer"""
+        listLayerName = self.__node.xpath("//*[local-name() = 'Layer']/*[local-name() = 'Name']")
+        
+        for layerName in listLayerName:
+            self.__listLayerName.append(layerName.text)
+
     def getCswUrl(self):
         """Methode getCswUrl gibt die URL fuer den CSW-Aufruf auf den Metadatensatz des WMS zurueck
         
@@ -63,3 +72,10 @@ class CapWms(object):
         """
         return self.__listCswUrl
     
+    def getListLayerName(self):
+        """Methode getListLayerName gibt eine List mit den Namen aller Layer zurueck
+        
+        Returns:
+            List: Namen aller Layer des Dienstes
+        """
+        return self.__listLayerName

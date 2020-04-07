@@ -56,7 +56,7 @@ Abb. 1: Daten-Dienste-Kopplung
 ![testfaelle.jpg](img/testfaelle.jpg)
 Abb. 2: Testfälle
 
-Einschränkend sei noch darauf hingewiesen, dass im Prozess nicht alle Eventualitäten abgefangen werden. So laufen Daten-Metadatensätze beispielswiese in eine Exception, wenn es zu ihnen keine Dienste bzw. nur einen WFS oder WMS gibt. In diesem Fall wird ein Eintrag *'ERROR BY Result:'* ins Logfile geschrieben. Auch die zu vermeidende Besonderheit, dass ein Daten-Metadatensatz mit mehreren WMS-Diensten verknüpft ist, wurde nicht berücksichtigt. Dies kann ggf. zu einem *'FAILED'* Ergebnis führen. Die Testergebnisse werden in ein CSV-File geschrieben, dessen Struktur der Tabelle 1 zu entnehmen ist.
+Einschränkend sei noch darauf hingewiesen, dass im Prozess nicht alle Eventualitäten abgefangen werden. Dies kann ggf. zu einem *'FAILED'* Ergebnis führen oder im Fall einer Exception, zu einem Eintrag *'ERROR BY Result:'* im Logfile. Nicht geprüft werden aktuell Daten-Metadatensätze, die weniger oder mehr als einen WFS und WMS besitzen. Die Testergebnisse werden in ein CSV-File geschrieben, dessen Struktur der Tabelle 1 zu entnehmen ist.
 
 ![tab_results.jpg](img/tab_results.jpg)
 Tab. 1: Tabellenstruktur Testergebnisse

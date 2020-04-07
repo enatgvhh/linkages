@@ -13,9 +13,11 @@ class CapWfs(object):
         self.__node = element
         self.__cswUrl = None
         self.__listMdUid = []
+        self.__listLayerName = []
         
         self.__setCswUrl()
         self.__setLayerUid()
+        self.__setLayerName()
         
     def __setCswUrl(self):
         """private Methode __setCswUrl extrahiert die URL des CSW-Aufrufs auf den Metadatensatz des WFS"""
@@ -27,7 +29,14 @@ class CapWfs(object):
         
         for layerMdUid in listLayerMdUid:
             self.__listMdUid.append(layerMdUid.text)
-            
+
+    def __setLayerName(self):
+        """private Methode __setLayerName extrahiert den Namen fuer alle Layer"""
+        listLayerName = self.__node.xpath("//*[local-name() = 'FeatureTypeList']/*[local-name() = 'FeatureType']/*[local-name() = 'Name']")
+        
+        for layerName in listLayerName:
+            self.__listLayerName.append(layerName.text)
+
     def getCswUrl(self):
         """Methode getCswUrl gibt die URL fuer den CSW-Aufruf auf den Metadatensatz des WFS zurueck
         
@@ -44,3 +53,10 @@ class CapWfs(object):
         """
         return self.__listMdUid
     
+    def getListLayerName(self):
+        """Methode getListLayerName gibt eine List mit den Namen aller Layer zurueck
+        
+        Returns:
+            List: Namen aller Layer des Dienstes
+        """
+        return self.__listLayerName
